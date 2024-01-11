@@ -8,7 +8,7 @@ public with sharing class AutoNumberService {
         for (AggregateResult ar : [
             SELECT Company, MAX(IncrementalNumber__c) maxNumber
             FROM Lead
-            WHERE Company IN :companyNames
+            WHERE Company IN :companyNames AND IncrementalNumber__c != NULL
             GROUP BY Company
         ]) {
             maxNumberByCompany.put((String) ar.get('Company'), (Decimal) ar.get('maxNumber'));
@@ -22,7 +22,7 @@ public with sharing class AutoNumberService {
             newLead.AutoNumber__c =
                 newLead.Company +
                 '-' +
-                String.valueOf(Integer.valueOf(newLead.IncrementalNumber__c));
+                String.valueOf(Integer.valueOf(newLead.IncrementalNumber__c)).leftPad(6, '0');
             maxNumberByCompany.put(newLead.Company, newLead.IncrementalNumber__c);
         }
     }
